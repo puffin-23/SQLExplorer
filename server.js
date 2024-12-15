@@ -49,16 +49,26 @@ app.post('/execute', async (req, res) => {
 
         if (results.length === undefined) { //определения, был ли выполнен модифицирующий SQL запрос (например, INSERT, UPDATE или DELETE), который, как правило, не возвращает массив результатов.
             // Это модифицирующий запрос
-            return res.json({ affectedRows: results.affectedRows });
+            let result = res.json({ affectedRows: results.affectedRows });
+            
+            return result;
+            
+            
         } else {
             // Это SELECT запрос
-            return res.json({ data: results });
+            let result = res.json({ data: results });
+            
+            return result;
         }
     })
     } catch (error) {
         res.status(500).json({ error: error.message });
         if (connection) {
             connection.end();
+        }
+    } finally {
+        if (connection) {
+            connection.release();
         }
     }
 });
