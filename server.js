@@ -3,10 +3,8 @@ const mysql = require('mysql2');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
-
 const app = express();
 const PORT = 8580;
-
 
 app.use(express.static('public'));
 app.use(cors());
@@ -15,7 +13,7 @@ app.use(bodyParser.json());
 // Настроим соединение с базой данных MySQL
 const poolConfig = {
     connectionLimit : 2,
-    host: '178.172.195.18',
+    host: 'localhost',
     port: 3306,
     user: 'root',
     password: '1234',
@@ -28,8 +26,6 @@ let pool = mysql.createPool(poolConfig);
 app.post('/execute', async (req, res) => {
     
     const query = req.body.query
-    console.log(query);
-
 
     let connection=null;
     try {
@@ -46,18 +42,11 @@ app.post('/execute', async (req, res) => {
             });
         })
 
-        console.log(connection);
-        
-
-
         connection.query(query, (error, results) => { //два аргумента: SQL запрос и колбэк, который будет вызван после выполнения запроса
         if (error) {
             return res.status(400).json({ error: error.message });
         }
-        console.log(query);
-        console.log(results);
-        
-        
+
         if (results.length === undefined) { //определения, был ли выполнен модифицирующий SQL запрос (например, INSERT, UPDATE или DELETE), который, как правило, не возвращает массив результатов.
             // Это модифицирующий запрос
             return res.json({ affectedRows: results.affectedRows });
@@ -74,9 +63,6 @@ app.post('/execute', async (req, res) => {
     }
 });
 
-
-
-// Запуск сервера
 app.listen(PORT, () => {
     console.log(`Сервер запущен на порту ${PORT}`);
 });
